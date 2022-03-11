@@ -1,0 +1,160 @@
+4. Access Smart contract - 2 METHODS:
+
+1. Truffle abstraction method
+
+truffle console
+
+const instance = await *"contractname".deployed()
+*without quotation marks
+
+instance and enter
+
+we can then reach out state var values by:
+
+const counter = await instance.counter()
+
+instance and enter or
+
+counter.toString()
+
+const test = await instance.test()
+
+instance to see details and
+
+test.toString() to see the value
+
+2. to interact with your contract with web3 lib
+
+truffle console and then
+
+const instance = new web3.eth.Contract(Faucet.abi, "CONTRACT ADDRESS HERE from ganache")
+
+and then
+
+instance
+
+const funds = await instance.methods.funds().call()
+
+funds.toString() will bring values
+
+--------------------------------------------------------------------------------
+TO SEND TX VIA WEB3
+
+truffle console
+
+web3.eth.sendTransaction({from: accounts[0], to: "0x1BE561e627aB4cd56B9B25A1E026F3446b08f112", value: "1000000000000000000"})
+
+TO GET BLOCK
+
+web3.eth.getBlock("15")
+
+TO GET BYTE CODE OF CONTRACT
+
+web3.eth.getCode("0x1BE561e627aB4cd56B9B25A1E026F3446b08f112")
+
+--------------------------------------------------------------------------------
+How header is encoded
+https://ethereum.stackexchange.com/questions/67280/block-header-hash-calculation
+
+About RLP encoding
+https://medium.com/coinmonks/data-structure-in-ethereum-episode-1-recursive-length-prefix-rlp-encoding-decoding-d1016832f919
+
+Encoder
+https://toolkit.abdk.consulting/ethereum#rlp
+
+bits, bytes, words
+https://www.youtube.com/watch?v=Weyv-V8xz0c
+
+EVMs, and Bytecode
+https://www.youtube.com/watch?v=RxL_1AfV7N4
+
+Memory in computer:
+https://www.youtube.com/watch?v=F0Ri2TpRBBg
+--------------------------------------------------------------------------------
+TO SEND ETH VIA FUNCTION
+const instance = await Faucet.deployed()
+instance.addFunds({value: "ETH AMOUNT YOU WANT TO SEND in WEI"}) - automatically from account 0 in ganache
+--------------------------------------------------------------------------------
+SENDING TRANSACTION VIA FUNCTION SIGNATURE
+web3.eth.sendTransaction({from: accounts[0], to: "0x5EA8Bf71159b970F4Ed6F1EeFbdb82c20a7BEb22", data: "0xa26759cb", value: "1000000000000000000"})
+--------------------------------------------------------------------------------
+METHOD CALLS + JSON RPC
+truffle console
+const instance = await Faucet.deployed()
+const result = await instance.justTesting()
+result.toString()
+accounts
+
+JSON-RPC
+Postman new
+copy http from ganache
+select raw+JSON
+https://eth.wiki/json-rpc/API - find command here and copy curly brackets. in this case
+{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}
+click send
+
+TO ADD funds
+{
+    "jsonrpc":"2.0",
+    "method":"eth_sendTransaction",
+    "params":[{
+        "from": "0x8E955B32C324fd9b5997f1b56C0cc44c3665aaF0", // ACCOUNT ADDRESS
+        "to": "0xBeF165C9fce970D74e3b83A3132F4Da6a4dac994", // CONTRACT ADDRESS
+        "gas": "0x76c0", 
+        "gasPrice": "0x9184e72a000", 
+        "value": "0xDE0B6B3A7640000", // HEX FORMAT
+        "data": "0xa26759cb"}], // FIRST 4 BYTES OF KECCAK256
+        "id":2
+    }
+--------------------------------------------------------------------------------
+ADDRESS ARRAY
+
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.4.22 < 0.9.0;
+
+contract Faucet{
+
+   address[] public funders;
+   
+   receive () external payable {}
+
+   function addFunds() external payable {
+       funders.push(msg.sender);
+   }
+
+   function getAllFunders() public view returns(address[] memory) {
+        return funders;
+   }
+
+   function getFunderAtIndex(uint8 index) external view returns(address) {
+       address[] memory _funders = getAllFunders();
+       return _funders[index];
+   }
+}
+
+// const instance = await Faucet.deployed()
+
+const instance = await Faucet.deployed()
+instance.addFunds({from: accounts[0], value: "100000000000000000"})
+instance.addFunds({from: accounts[1], value: "100000000000000000"})
+instance.addFunds({from: accounts[2], value: "100000000000000000"})
+
+instance.getFunderAtIndex(0)
+instance.getAllFunders()
+
+--------------------------------------------------------------------------------
+GET STORAGE
+
+web3.eth.getStorageAt("0xC78949c12d7d414a9657F65F74707b4aE2ffC597", 0)
+--------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
